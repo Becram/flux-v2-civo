@@ -1,0 +1,46 @@
+{{- if  .Values.cronjob }}
+{{- $context := . -}}
+{{- range $index, $cronjob := .Values.cronjob -}}
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ $cronjob.name }}
+  labels:
+    app.kubernetes.io/instance: {{ $context.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $context.Release.Service }}
+spec:
+  concurrencyPolicy: {{ $cronjob.concurrency }}
+  schedule: {{ $cronjob.schedule | quote  }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          ttlSecondsAfterFinished: {{ $cronjob.ttl }}
+          containers:
+          - name: {{ $cronjob.name }}
+            image: {{ $cronjob.image }}
+            command: ["/bin/sh","-c"]
+            args: [
+                  {{- range $index, $element := $cronjob.args -}}
+                  {{- if $index -}},{{- end -}}
+                  {{- $element | quote -}}
+                  {{- end -}}
+                ]
+            env:
+            {{- range $key, $value := $cronjob.env }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- range $secrets := $cronjob.secrets }}
+            {{- range $secret := $secrets.values }}
+            - name: {{ $secret | upper  }}
+              valueFrom:
+              secretKeyRef:
+                name: {{ $secrets.name }}
+                key: "{{ $secret }}"
+            {{- end }}
+            {{- end }}
+          restartPolicy: OnFailure
+{{ end }}
+{{- end }}

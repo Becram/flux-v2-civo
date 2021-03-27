@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: flux-system
+resources:
+  - bitnami.yaml
+  - flask-app.yaml
+  - jetstack.yaml
+  - ingress-nginx.yaml
+  - kong.yaml

@@ -1,0 +1,222 @@
+# ---
+# apiVersion: cert-manager.io/v1alpha2
+# kind: ClusterIssuer
+# metadata:
+#   name: letsencrypt-prod
+# spec:
+#   acme:
+#     server: https://acme-v02.api.letsencrypt.org/directory
+#     email: bdhoj@sertiscorp.com
+#     privateKeySecretRef:
+#       name: letsencrypt-prod
+#     solvers:
+#     - selector: {}
+#       http01:
+#         ingress:
+#           class: nginx
+# ---
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: receiver
+#   namespace: flux-system
+# spec:
+#   type: ClusterIP
+#   selector:
+#     app: notification-controller
+#   ports:
+#     - name: http
+#       port: 9292
+#       protocol: TCP
+#       targetPort: 9292
+
+# --- 
+
+# apiVersion: networking.k8s.io/v1beta1
+# kind: Ingress
+# metadata:
+#   name: flux-ingress
+#   namespace: flux-system
+#   annotations:
+#     kubernetes.io/ingress.class: "nginx"
+#     kubernetes.io/tls-acme: "true"
+#     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+#     nginx.ingress.kubernetes.io/proxy-read-timeout: "360s"
+# spec:
+#   rules:
+#   - host: flux-v2-toolkit.sertislab.com
+#     http:
+#       paths:
+#       - path: /hook
+#         backend:
+#           serviceName: receiver
+#           servicePort: 9292
+#   tls:
+#   - secretName: flux-toolkit-tls-cert
+#     hosts:
+#       - flux-v2-toolkit.sertislab.com
+# ---
+
+# apiVersion: notification.toolkit.fluxcd.io/v1beta1
+# kind: Receiver
+# metadata:
+#   name: flask-app
+#   namespace: flux-system
+# spec:
+#   type: gitlab
+#   secretRef:
+#     name: webhook-token
+#   resources:
+#     - kind: ImageRepository
+#       name: app-1
+
+# ---
+
+# apiVersion: v1
+# kind: ServiceAccount
+# metadata:
+#   labels:
+#     app.kubernetes.io/instance: flux-system
+#     app.kubernetes.io/version: v0.10.0
+#   name: flux
+#   namespace: flux-system
+#   annotations:
+#      iam.gke.io/gcp-service-account: flux-container-registry@sertis-devops-playground.iam.gserviceaccount.com
+
+
+# ---
+# kind: Role
+# apiVersion: rbac.authorization.k8s.io/v1
+# metadata:
+#   name: gcr-credentials-sync
+#   namespace: flux-system
+# rules:
+# - apiGroups: [""]
+#   resources:
+#   - secrets
+#   verbs:
+#   - delete
+#   - create
+
+# ---
+# kind: RoleBinding
+# apiVersion: rbac.authorization.k8s.io/v1
+# metadata:
+#   name: gcr-credentials-sync
+#   namespace: flux-system
+# subjects:
+# - kind: ServiceAccount
+#   name: flux
+# roleRef:
+#   kind: Role
+#   name: gcr-credentials-sync
+#   apiGroup: ""
+
+# ---
+
+# apiVersion: batch/v1beta1
+# kind: CronJob
+# metadata:
+#   name: gcr-credentials-sync
+#   namespace: flux-system
+# spec:
+#   suspend: false
+#   schedule: "*/45 * * * *"
+#   failedJobsHistoryLimit: 1
+#   successfulJobsHistoryLimit: 1
+#   jobTemplate:
+#     spec:
+#       template:
+#         spec:
+#           serviceAccountName: flux
+#           restartPolicy: Never
+#           containers:
+#           - image: google/cloud-sdk
+#             name: create-secret
+#             imagePullPolicy: IfNotPresent
+#             env:
+#             - name: SECRET_NAME
+#               value: gcr-credentials
+#             - name: GCR_REGISTRY
+#               value: asia.gcr.io # fill in the registry name e.g gcr.io, eu.gcr.io
+#             command:
+#             - /bin/bash
+#             - -ce
+#             - |-
+#               kubectl delete secret --ignore-not-found $SECRET_NAME
+#               kubectl create secret docker-registry $SECRET_NAME \
+#                 --docker-server="$GCR_REGISTRY" \
+#                 --docker-username=oauth2accesstoken \
+#                 --docker-password="$(gcloud auth print-access-token)" 
+
+# ---
+# apiVersion: image.toolkit.fluxcd.io/v1alpha1
+# kind: ImageUpdateAutomation
+# metadata:
+#   name: flux-system
+#   namespace: flux-system
+# spec:
+#   checkout:
+#     branch: master
+#     gitRepositoryRef:
+#       name: flux-system
+#   commit:
+#     authorEmail: bdhoj@sertiscorp.com
+#     authorName: sertis.bikram
+#     messageTemplate: |
+#       Automated image update
+
+#       Automation name: {{ .AutomationObject }}
+
+#       Files:
+#       {{ range $filename, $_ := .Updated.Files -}}
+#       - {{ $filename }}
+#       {{ end -}}
+
+#       Objects:
+#       {{ range $resource, $_ := .Updated.Objects -}}
+#       - {{ $resource.Kind }} {{ $resource.Name }}
+#       {{ end -}}
+
+#       Images:
+#       {{ range .Updated.Images -}}
+#       - {{.}}
+#       {{ end -}}
+#   interval: 1m0s
+#   push:
+#     branch: master
+#   update:
+#     path: ./apps/playground
+#     strategy: Setters
+
+---
+# notifications
+apiVersion: notification.toolkit.fluxcd.io/v1beta1
+kind: Provider
+metadata:
+  name: slack
+  namespace: flux-system
+spec:
+  type: slack
+  channel: sre-notifications
+  secretRef:
+    name: slack-url
+---
+# apiVersion: notification.toolkit.fluxcd.io/v1beta1
+# kind: Alert
+# metadata:
+#   name: on-call-webapp
+#   namespace: flux-system
+# spec:
+#   providerRef:
+#     name: slack
+#   eventSeverity: info
+#   eventSources:
+#     - kind: GitRepository
+#       name: '*'
+#     - kind: Kustomization
+#       name: '*'
+#     - kind: ImageRepository
+#       name: '*'
+# ---

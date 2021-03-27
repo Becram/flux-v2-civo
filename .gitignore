@@ -1,0 +1,2 @@
+sops/*
+apps/playground/secrets/basic.yaml
