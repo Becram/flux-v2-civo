@@ -1,0 +1,44 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kong
+spec:
+  releaseName: kong
+  chart:
+    spec:
+      chart: kong
+      sourceRef:
+        kind: HelmRepository
+        name: kong
+        namespace: flux-system
+      version: "1.15.1"
+  interval: 1h0m0s
+  install:
+    remediation:
+      retries: 3
+  # Default values
+  # https://github.com/bitnami/charts/blob/master/bitnami/nginx-ingress-controller/values.yaml
+  values:
+    ingressController:
+      installCRDs: false
+    admin:
+      enabled: true
+      http:
+        enabled: true
+    postgresql:
+      enabled: false
+      # postgresqlUsername: kong
+      # postgresqlDatabase: kong
+      # service:
+      #   port: 5432
+
+    env:
+      database: "postgres"
+      pg_host: psql-postgresql.psql
+      pg_port: 5432
+      pg_user: kong
+      pg_password: kong
+      pg_database: kong
+      pg_ssl: "off"
+      pg_ssl_verify: "off"
+
