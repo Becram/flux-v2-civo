@@ -6,7 +6,7 @@ metadata:
 spec:
   chart:
     spec:
-      chart: apps/playground/charts/app-1
+      chart: apps/dev/charts/app-1
       sourceRef:
         kind: GitRepository
         name: flux-system
