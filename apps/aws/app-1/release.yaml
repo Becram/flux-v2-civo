@@ -1,0 +1,39 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: app-1
+  namespace: app
+spec:
+  chart:
+    spec:
+      chart: apps/aws/charts/app-1
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  interval: 1m
+  install:
+    remediation:
+      retries: 3
+  # Default values
+  # https://github.com/stefanprodan/podinfo/blob/master/charts/podinfo/values.yaml
+  values:
+    replicas: 1
+    image: nginx:latest # {"$imagepolicy": "flux-system:app-1"}
+    exposedPort: 80
+    containerPort: 80
+    ingress:
+      enabled: false
+      annotations:
+        kubernetes.io/ingress.class: "nginx"
+        cert-manager.io/cluster-issuer: "letsencrypt-prod"
+        kubernetes.io/tls-acme: "true"
+        kubernetes.io/ssl-redirect: "true"
+      hosts:
+      - host: playground-flask-app.sertislab.com
+        paths:
+        - /
+      tls:
+      - secretName: chat-gw-esp-dev-tls
+        hosts:
+        - playground-flask-app.sertislab.com
