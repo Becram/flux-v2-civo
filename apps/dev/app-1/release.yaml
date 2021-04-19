@@ -22,6 +22,8 @@ spec:
     image: nginx:latest # {"$imagepolicy": "flux-system:app-1"}
     exposedPort: 80
     containerPort: 80
+    annotations:
+      linkerd.io/inject: enabled
     ingress:
       enabled: false
       annotations:
