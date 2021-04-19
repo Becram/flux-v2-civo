@@ -48,7 +48,7 @@ kind: HelmRelease
 metadata:
   name: linkerd
 spec:
-  releaseName: linkerd2
+  releaseName: linkerd
   chart:
     spec:
       chart: linkerd2
