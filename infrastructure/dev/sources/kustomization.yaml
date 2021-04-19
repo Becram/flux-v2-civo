@@ -7,3 +7,4 @@ resources:
   - jetstack.yaml
   - ingress-nginx.yaml
   - kong.yaml
+  - linkerd.yaml

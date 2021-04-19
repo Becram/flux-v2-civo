@@ -1,2 +1,3 @@
 sops/*
 apps/playground/secrets/basic.yaml
+linkerd-test/*
