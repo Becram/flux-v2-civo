@@ -68,18 +68,18 @@ spec:
     identity:
       issuer: 
         scheme: kubernetes.io/tls
-
-    identityTrustAnchorsPEM: |
-      -----BEGIN CERTIFICATE-----
-      MIIBjTCCATOgAwIBAgIQCUpxwX4dhgnJkJMvQPgQSjAKBggqhkjOPQQDAjAlMSMw
-      IQYDVQQDExpyb290LmxpbmtlcmQuY2x1c3Rlci5sb2NhbDAeFw0yMTA0MTkwNjAx
-      NDFaFw0zMTA0MTcwNjAxNDFaMCUxIzAhBgNVBAMTGnJvb3QubGlua2VyZC5jbHVz
-      dGVyLmxvY2FsMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEzuEAIkiq4fLtjs4P
-      NaFxxbJT7OQksd2jqsaZH1yBhjED4FULowzHDcuH1jNDb70I/RwjEjqDUtMZsKwj
-      zlbGJaNFMEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYD
-      VR0OBBYEFN52WEqetsTBb0YpcaDuGSVa7RZBMAoGCCqGSM49BAMCA0gAMEUCIGdP
-      WYWVUEOyqJJhIqFjckplxOlb220MFkaaeBMyonadAiEA5y+rl+tVqm09m3YtqWoJ
-      lqb6vttA0+CkN2ZshEFOYrM=
-      -----END CERTIFICATE-----
+    global:
+      identityTrustAnchorsPEM: |
+        -----BEGIN CERTIFICATE-----
+        MIIBjTCCATOgAwIBAgIQCUpxwX4dhgnJkJMvQPgQSjAKBggqhkjOPQQDAjAlMSMw
+        IQYDVQQDExpyb290LmxpbmtlcmQuY2x1c3Rlci5sb2NhbDAeFw0yMTA0MTkwNjAx
+        NDFaFw0zMTA0MTcwNjAxNDFaMCUxIzAhBgNVBAMTGnJvb3QubGlua2VyZC5jbHVz
+        dGVyLmxvY2FsMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEzuEAIkiq4fLtjs4P
+        NaFxxbJT7OQksd2jqsaZH1yBhjED4FULowzHDcuH1jNDb70I/RwjEjqDUtMZsKwj
+        zlbGJaNFMEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYD
+        VR0OBBYEFN52WEqetsTBb0YpcaDuGSVa7RZBMAoGCCqGSM49BAMCA0gAMEUCIGdP
+        WYWVUEOyqJJhIqFjckplxOlb220MFkaaeBMyonadAiEA5y+rl+tVqm09m3YtqWoJ
+        lqb6vttA0+CkN2ZshEFOYrM=
+        -----END CERTIFICATE-----
 
 
