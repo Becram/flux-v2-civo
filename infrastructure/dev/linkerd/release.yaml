@@ -28,7 +28,7 @@ metadata:
 spec:
   secretName: linkerd-identity-issuer
   duration: 1h
-  renewBefore: 55m
+  renewBefore: 5m
   issuerRef:
     name: linkerd-trust-anchor
     kind: Issuer
@@ -72,8 +72,8 @@ metadata:
   namespace: linkerd
 spec:
   secretName: linkerd-proxy-injector-k8s-tls
-  duration: 1h
-  renewBefore: 55m
+  duration: 24h
+  renewBefore: 1h
   issuerRef:
     name: webhook-issuer
     kind: Issuer
