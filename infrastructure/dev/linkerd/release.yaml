@@ -1,3 +1,4 @@
+### Identity Rotation keys and crt
 apiVersion: v1
 data:
   tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJqVENDQVRPZ0F3SUJBZ0lRQ1VweHdYNGRoZ25Ka0pNdlFQZ1FTakFLQmdncWhrak9QUVFEQWpBbE1TTXcKSVFZRFZRUURFeHB5YjI5MExteHBibXRsY21RdVkyeDFjM1JsY2k1c2IyTmhiREFlRncweU1UQTBNVGt3TmpBeApOREZhRncwek1UQTBNVGN3TmpBeE5ERmFNQ1V4SXpBaEJnTlZCQU1UR25KdmIzUXViR2x1YTJWeVpDNWpiSFZ6CmRHVnlMbXh2WTJGc01Ga3dFd1lIS29aSXpqMENBUVlJS29aSXpqMERBUWNEUWdBRXp1RUFJa2lxNGZMdGpzNFAKTmFGeHhiSlQ3T1Frc2QyanFzYVpIMXlCaGpFRDRGVUxvd3pIRGN1SDFqTkRiNzBJL1J3akVqcURVdE1ac0t3agp6bGJHSmFORk1FTXdEZ1lEVlIwUEFRSC9CQVFEQWdFR01CSUdBMVVkRXdFQi93UUlNQVlCQWY4Q0FRRXdIUVlEClZSME9CQllFRk41MldFcWV0c1RCYjBZcGNhRHVHU1ZhN1JaQk1Bb0dDQ3FHU000OUJBTUNBMGdBTUVVQ0lHZFAKV1lXVlVFT3lxSkpoSXFGamNrcGx4T2xiMjIwTUZrYWFlQk15b25hZEFpRUE1eStybCt0VnFtMDltM1l0cVdvSgpscWI2dnR0QTArQ2tOMlpzaEVGT1lyTT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
@@ -43,6 +44,93 @@ spec:
   - server auth
   - client auth
 ---
+### Webhook keys and crts
+apiVersion: v1
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJsRENDQVRxZ0F3SUJBZ0lSQU44aEc2YktKMURDdEhuN2NLQXNSKzh3Q2dZSUtvWkl6ajBFQXdJd0tERW0KTUNRR0ExVUVBeE1kZDJWaWFHOXZheTVzYVc1clpYSmtMbU5zZFhOMFpYSXViRzlqWVd3d0hoY05NakV3TkRFNQpNRGN3TkRBNVdoY05NekV3TkRFM01EY3dOREE1V2pBb01TWXdKQVlEVlFRREV4MTNaV0pvYjI5ckxteHBibXRsCmNtUXVZMngxYzNSbGNpNXNiMk5oYkRCWk1CTUdCeXFHU000OUFnRUdDQ3FHU000OUF3RUhBMElBQkZrcGg4bUsKK1YydmV4RUtmVUpMMTJsTFE0YTBTTlZxaW1VVVFvcG9RZjhzQWk2V3BtQnNHWDlKOTcxN0c0ZEptM0VWd1owegpoRlpWVGIyajFnaXpDQVNqUlRCRE1BNEdBMVVkRHdFQi93UUVBd0lCQmpBU0JnTlZIUk1CQWY4RUNEQUdBUUgvCkFnRUJNQjBHQTFVZERnUVdCQlFFRkFqUURqVTVMRmNFRXluSCtzcFpWeTB1NGpBS0JnZ3Foa2pPUFFRREFnTkkKQURCRkFpRUFsN1lBWXFWbWc1U2NuSHpYWlZTdDRPblRkaDA1LzF6WWlpRVRVYTYyOWZzQ0lEc2RHWVVsWmJUWApIcTViVWcwNWkzalpmU0lQSFg3c1BXQm1FWFc2aWdWQgotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.key: LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUo3UTBlQjFKUm1VVnQ5ZnRHdGRTNnovZGEyNG9yUXFQMU02b0hiaHk2QThvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFV1NtSHlZcjVYYTk3RVFwOVFrdlhhVXREaHJSSTFXcUtaUlJDaW1oQi95d0NMcGFtWUd3WgpmMG4zdlhzYmgwbWJjUlhCblRPRVZsVk52YVBXQ0xNSUJBPT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo=
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: webhook-issuer-tls
+  namespace: linkerd
+type: kubernetes.io/tls
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: webhook-issuer
+  namespace: linkerd
+spec:
+  ca:
+    secretName: webhook-issuer-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: linkerd-proxy-injector
+  namespace: linkerd
+spec:
+  secretName: linkerd-proxy-injector-k8s-tls
+  duration: 24h
+  renewBefore: 1h
+  issuerRef:
+    name: webhook-issuer
+    kind: Issuer
+  commonName: linkerd-proxy-injector.linkerd.svc
+  dnsNames:
+  - linkerd-proxy-injector.linkerd.svc
+  isCA: false
+  privateKey:
+    algorithm: ECDSA
+  usages:
+  - server auth
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: linkerd-sp-validator
+  namespace: linkerd
+spec:
+  secretName: linkerd-sp-validator-k8s-tls
+  duration: 24h
+  renewBefore: 1h
+  issuerRef:
+    name: webhook-issuer
+    kind: Issuer
+  commonName: linkerd-sp-validator.linkerd.svc
+  dnsNames:
+  - linkerd-sp-validator.linkerd.svc
+  isCA: false
+  privateKey:
+    algorithm: ECDSA
+  usages:
+  - server auth
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: linkerd-tap
+  namespace: linkerd
+spec:
+  secretName: linkerd-tap-k8s-tls
+  duration: 24h
+  renewBefore: 1h
+  issuerRef:
+    name: webhook-issuer
+    kind: Issuer
+  commonName: linkerd-tap.linkerd.svc
+  dnsNames:
+  - linkerd-tap.linkerd.svc
+  isCA: false
+  privateKey:
+    algorithm: ECDSA
+  usages:
+  - server auth
+
+
+
+---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -68,6 +156,7 @@ spec:
     identity:
       issuer: 
         scheme: kubernetes.io/tls
+
     global:
       identityTrustAnchorsPEM: |
         -----BEGIN CERTIFICATE-----
@@ -80,6 +169,51 @@ spec:
         VR0OBBYEFN52WEqetsTBb0YpcaDuGSVa7RZBMAoGCCqGSM49BAMCA0gAMEUCIGdP
         WYWVUEOyqJJhIqFjckplxOlb220MFkaaeBMyonadAiEA5y+rl+tVqm09m3YtqWoJ
         lqb6vttA0+CkN2ZshEFOYrM=
+        -----END CERTIFICATE-----
+    # webhook certificate keys
+    proxyInjector:
+      externalSecret: true 
+      caBundle: |
+        -----BEGIN CERTIFICATE-----
+        MIIBlDCCATqgAwIBAgIRAN8hG6bKJ1DCtHn7cKAsR+8wCgYIKoZIzj0EAwIwKDEm
+        MCQGA1UEAxMdd2ViaG9vay5saW5rZXJkLmNsdXN0ZXIubG9jYWwwHhcNMjEwNDE5
+        MDcwNDA5WhcNMzEwNDE3MDcwNDA5WjAoMSYwJAYDVQQDEx13ZWJob29rLmxpbmtl
+        cmQuY2x1c3Rlci5sb2NhbDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABFkph8mK
+        +V2vexEKfUJL12lLQ4a0SNVqimUUQopoQf8sAi6WpmBsGX9J9717G4dJm3EVwZ0z
+        hFZVTb2j1gizCASjRTBDMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/
+        AgEBMB0GA1UdDgQWBBQEFAjQDjU5LFcEEynH+spZVy0u4jAKBggqhkjOPQQDAgNI
+        ADBFAiEAl7YAYqVmg5ScnHzXZVSt4OnTdh05/1zYiiETUa629fsCIDsdGYUlZbTX
+        Hq5bUg05i3jZfSIPHX7sPWBmEXW6igVB
+        -----END CERTIFICATE-----
+    
+    profileValidator:
+      externalSecret: true
+      caBundle: |
+        -----BEGIN CERTIFICATE-----
+        MIIBlDCCATqgAwIBAgIRAN8hG6bKJ1DCtHn7cKAsR+8wCgYIKoZIzj0EAwIwKDEm
+        MCQGA1UEAxMdd2ViaG9vay5saW5rZXJkLmNsdXN0ZXIubG9jYWwwHhcNMjEwNDE5
+        MDcwNDA5WhcNMzEwNDE3MDcwNDA5WjAoMSYwJAYDVQQDEx13ZWJob29rLmxpbmtl
+        cmQuY2x1c3Rlci5sb2NhbDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABFkph8mK
+        +V2vexEKfUJL12lLQ4a0SNVqimUUQopoQf8sAi6WpmBsGX9J9717G4dJm3EVwZ0z
+        hFZVTb2j1gizCASjRTBDMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/
+        AgEBMB0GA1UdDgQWBBQEFAjQDjU5LFcEEynH+spZVy0u4jAKBggqhkjOPQQDAgNI
+        ADBFAiEAl7YAYqVmg5ScnHzXZVSt4OnTdh05/1zYiiETUa629fsCIDsdGYUlZbTX
+        Hq5bUg05i3jZfSIPHX7sPWBmEXW6igVB
+        -----END CERTIFICATE-----
+       
+    tap:
+      externalSecret: true
+      caBundle: |
+        -----BEGIN CERTIFICATE-----
+        MIIBlDCCATqgAwIBAgIRAN8hG6bKJ1DCtHn7cKAsR+8wCgYIKoZIzj0EAwIwKDEm
+        MCQGA1UEAxMdd2ViaG9vay5saW5rZXJkLmNsdXN0ZXIubG9jYWwwHhcNMjEwNDE5
+        MDcwNDA5WhcNMzEwNDE3MDcwNDA5WjAoMSYwJAYDVQQDEx13ZWJob29rLmxpbmtl
+        cmQuY2x1c3Rlci5sb2NhbDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABFkph8mK
+        +V2vexEKfUJL12lLQ4a0SNVqimUUQopoQf8sAi6WpmBsGX9J9717G4dJm3EVwZ0z
+        hFZVTb2j1gizCASjRTBDMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/
+        AgEBMB0GA1UdDgQWBBQEFAjQDjU5LFcEEynH+spZVy0u4jAKBggqhkjOPQQDAgNI
+        ADBFAiEAl7YAYqVmg5ScnHzXZVSt4OnTdh05/1zYiiETUa629fsCIDsdGYUlZbTX
+        Hq5bUg05i3jZfSIPHX7sPWBmEXW6igVB
         -----END CERTIFICATE-----
 
 
