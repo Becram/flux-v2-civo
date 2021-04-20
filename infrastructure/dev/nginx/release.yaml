@@ -23,6 +23,8 @@ spec:
       image:
         digest: ''
         pullPolicy: Always
+      podAnnotations:
+        linkerd.io/inject: enabled
       config:
         server-tokens: "false"
         hide-headers: "Server"
