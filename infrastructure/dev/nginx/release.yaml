@@ -30,7 +30,7 @@ spec:
       service:
         loadBalancerSourceRanges: ["0.0.0.0/0"]
         externalTrafficPolicy: "Local"
-        loadBalancerIP: 104.197.167.241
+        loadBalancerIP: 212.2.246.58
       kind: Deployment
       minReadySeconds: 5
       lifecycle:
