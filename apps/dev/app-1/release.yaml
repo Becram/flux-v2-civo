@@ -23,6 +23,7 @@ spec:
     exposedPort: 80
     containerPort: 80
     annotations:
+      config.linkerd.io/enable-debug-sidecar: "true"
       linkerd.io/inject: enabled
     ingress:
       enabled: false
