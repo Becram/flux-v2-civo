@@ -4,6 +4,7 @@ resources:
   - sources
   - cert-manager
   - linkerd
+  - linkerd-viz
   # - nginx
   # - redis
   # - kong
