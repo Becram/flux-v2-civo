@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: linkerd
+namespace: linkerd-viz
 resources:
   - namespace.yaml
   - release.yaml

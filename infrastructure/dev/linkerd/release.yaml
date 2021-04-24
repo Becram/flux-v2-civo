@@ -129,8 +129,6 @@ spec:
   usages:
   - server auth
 
-
-
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
