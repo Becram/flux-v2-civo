@@ -87,8 +87,6 @@ spec:
       retries: 3
   values:
     installNamespace: false
-    nodeSelector:
-      cloud.google.com/gke-nodepool: linkerd-pool
     # webhook certificate keys
     tapInjector:
       externalSecret: true 
