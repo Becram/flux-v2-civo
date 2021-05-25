@@ -3,8 +3,8 @@ kind: Kustomization
 namespace: flux-system
 resources:
   - bitnami.yaml
-  - flask-app.yaml
   - jetstack.yaml
   - ingress-nginx.yaml
-  - kong.yaml
   - linkerd.yaml
+  - stable.yaml
+  - app-generic-chart.yaml

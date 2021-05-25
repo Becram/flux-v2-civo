@@ -1,7 +1,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: HelmRepository
 metadata:
-  name: kong
+  name: stable
 spec:
   interval: 30m
-  url: https://charts.konghq.com
+  url: https://charts.helm.sh/stable

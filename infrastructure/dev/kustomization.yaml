@@ -1,11 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - sources
-  - cert-manager
-  - linkerd
-  - linkerd-viz
-  # - nginx
-  # - redis
-  # - kong
-  # - psql
+  - ../base/
+patchesStrategicMerge:
+  - cert-manager-patch.yaml
+  - nginx-patch.yaml
